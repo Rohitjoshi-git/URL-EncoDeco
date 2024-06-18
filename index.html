@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+            background-color: #fff;
+            font-size: 14px;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .success {
+            color: #4CAF50;
+        }
+
+        /* Media Query for Responsive Design */
+        @media (max-width: 600px) {
+            form {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>URL Shortener</h1>
+    <form id="shortenForm">
+        <input type="text" id="longURL" placeholder="Enter the long URL" required>
+        <button type="submit">Shorten</button>
+    </form>
+    <div id="shortenResult" class="result"></div>
+
+    <h1>URL Decoder</h1>
+    <form id="decodeForm">
+        <input type="text" id="shortURL" placeholder="Enter the short URL" required>
+        <button type="submit">Decode</button>
+    </form>
+    <div id="decodeResult" class="result"></div>
+
+    <script>
+        document.getElementById('shortenForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const longURL = document.getElementById('longURL').value;
+
+            fetch('/encode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ longURL })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('shortenResult').innerHTML = '<span class="error">Error: ' + data.error + '</span>';
+                } else {
+                    document.getElementById('shortenResult').innerHTML = '<span class="success">Shortened URL: <a href="' + data.shortURL + '" target="_blank">' + data.shortURL + '</a></span>';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('decodeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const shortURL = document.getElementById('shortURL').value;
+
+            fetch('/decode', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ shortURL })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('decodeResult').innerHTML = '<span class="error">Error: ' + data.error + '</span>';
+                } else {
+                    document.getElementById('decodeResult').innerHTML = '<span class="success">Original URL: <a href="' + data.longURL + '" target="_blank">' + data.longURL + '</a></span>';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
