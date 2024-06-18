@@ -55,7 +55,7 @@ app.post('/encode', (req, res) => {
         res.status(400).json({ error: 'Invalid URL' });
     }
 });
-//decode
+
 app.post('/decode', (req, res) => {
     const shortURL = req.body.shortURL;
     const baseUrlPattern = new RegExp(`^${urlShortener.baseUrl}`);
